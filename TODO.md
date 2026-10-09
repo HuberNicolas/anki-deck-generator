@@ -15,6 +15,6 @@ Open tasks for this repository.
 
 - [x] Add the MIT license
 - [x] Rewrite the old university e-mail address in the commit history
-- [ ] Push the rewritten `main` and the tags, check that CI passes
-- [ ] Create GitHub releases for `v1.0.0` and `v2.0.0`
-- [ ] Add a description and topics on GitHub
+- [x] Push the rewritten `main` and the tags; CI passes
+- [x] Create GitHub releases for `v1.0.0` and `v2.0.0`
+- [x] Add a description and topics on GitHub
