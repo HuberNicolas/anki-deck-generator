@@ -1,83 +1,141 @@
-# Anki Deck Generator from Markdown
+<div align="center">
 
-This Python script automatically generates Anki decks from Markdown files. It is designed to create flashcards with a term on the front and its definition on the back. Optionally, it can reverse the cards, placing the definition on the front and the term on the back.
+# Anki Deck Generator
+
+**Turn a Markdown list of terms and definitions into an Anki deck**
+
+[![CI](https://github.com/HuberNicolas/anki-deck-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/HuberNicolas/anki-deck-generator/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![Anki](https://img.shields.io/badge/Anki-235390?logo=anki&logoColor=white)
+![uv](https://img.shields.io/badge/uv-DE5FE9?logo=uv&logoColor=white)
+![Ruff](https://img.shields.io/badge/Ruff-D7FF64?logo=ruff&logoColor=black)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+[Quick start](#quick-start) · [Markdown format](#markdown-format) · [Usage](#usage)
+
+</div>
+
+A single Python script that reads a Markdown file with lines like `- **Term** - Definition` and writes an `.apkg`
+file that you can import into [Anki](https://apps.ankiweb.net/). It uses [genanki](https://github.com/kerrickstaley/genanki).
 
 ## Features
 
-- **Automatic Deck Generation**: Converts Markdown files into Anki decks.
-- **Reversible Cards**: Option to reverse the question and answer on the cards.
-- **CLI Support**: Easily use the script from the command line.
+- 📝 One card per list item: bold term on the front, definition on the back
+- 🔁 `--reverse` creates a second deck with the definition on the front
+- ♻️ Re-importing an updated file updates the existing cards instead of creating duplicates
+- 🏷️ Notes after the term, such as `(AUS)`, stay part of the term
 
-## Prerequisites
+> [!NOTE]
+> Written in February 2024 as a small personal tool for learning vocabulary. The original version is tagged
+> [`v1.0.0`](https://github.com/HuberNicolas/anki-deck-generator/tree/v1.0.0). Version 2 fixes two bugs of that
+> version (see [Changes since v1.0.0](#changes-since-v100)) and adds tests, but the tool stays a single script.
 
-Before you begin, ensure you have met the following requirements:
+## Contents
 
-- Python 3.6 or later installed on your system.
-- Anki installed on your system to import and use the generated decks.
-- The `genanki` Python package installed. You can install it using pip:
+- [Quick start](#quick-start)
+- [Markdown format](#markdown-format)
+- [Usage](#usage)
+- [Repository structure](#repository-structure)
+- [Development](#development)
+- [Changes since v1.0.0](#changes-since-v100)
+- [License](#license)
+- [Author](#author)
 
-  ```bash
-  pip install genanki
-  ```
+## Quick start
 
-## Installation
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/) and Anki.
 
-1. Clone this repository to your local machine:
+1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/anki-deck-generator.git
+   git clone https://github.com/HuberNicolas/anki-deck-generator.git
    ```
-
-2. Navigate into the cloned repository:
 
    ```bash
    cd anki-deck-generator
    ```
 
-3. Ensure you have the required Python packages installed:
+2. Create a deck from the example file. uv installs Python and genanki on the first run:
 
    ```bash
-   pip install -r requirements.txt
+   uv run create_anki_deck.py examples/phrasal-verbs.md "Phrasal Verbs"
    ```
+
+3. In Anki, choose **File → Import** and select `Phrasal_Verbs.apkg`.
+
+Without uv, install the dependency with `pip install genanki` and run the script with `python create_anki_deck.py …`.
+
+## Markdown format
+
+Each card is a list item with the term in bold, followed by a dash and the definition:
+
+```markdown
+- **Back out of** - To withdraw from a commitment or promise.
+- **Bail up** (AUS) - To corner someone and start a conversation; historically, to rob someone.
+```
+
+- List markers `-`, `*` and `+` work; the separator can be `-`, `–` or `—` with spaces around it.
+- Text between the bold term and the separator, such as `(AUS)`, is added to the term: `Bail up (AUS)`.
+- All other lines (headings, text, items without a bold term) are ignored.
+- The text is shown as plain text in Anki. Markdown formatting inside the definition is not converted.
+
+See [`examples/phrasal-verbs.md`](examples/phrasal-verbs.md) for a complete file.
 
 ## Usage
 
-To use the script, run it from the command line, providing the path to your Markdown file and the desired name for your Anki deck. Optionally, you can include the `--reverse` flag to reverse the front and back of the cards.
+```bash
+uv run create_anki_deck.py <markdown_file> <deck_name> [--reverse] [-o OUTPUT]
+```
+
+| Option | Effect |
+|---|---|
+| `markdown_file` | Path to the Markdown file |
+| `deck_name` | Name of the deck in Anki |
+| `--reverse` | Definition on the front, term on the back. Adds ` (Reversed)` to the deck name, so both decks can exist side by side |
+| `-o`, `--output` | Output file. Default: the deck name with spaces replaced by `_`, plus `.apkg`, in the current folder |
+
+Create the reversed deck:
 
 ```bash
-python create_anki_deck.py <path_to_markdown_file> <deck_name> [--reverse]
+uv run create_anki_deck.py examples/phrasal-verbs.md "Phrasal Verbs" --reverse
 ```
 
-### Example
+To add or change cards later, edit the Markdown file, run the script again with the same deck name and import the new
+file. Anki updates cards with the same term and adds new ones. Cards whose term you removed or renamed stay in Anki
+until you delete them there.
 
-To create a deck named "Phrasal Verbs":
+## Repository structure
 
-```bash
-python create_anki_deck.py "Phrasal Verbs.md" "Phrasal Verbs"
-```
+| Path | Content |
+|---|---|
+| [`create_anki_deck.py`](create_anki_deck.py) | The script: Markdown parser, deck builder and command line interface |
+| [`examples/`](examples) | Example word list |
+| [`tests/`](tests) | pytest tests |
+| [`pyproject.toml`](pyproject.toml), [`uv.lock`](uv.lock) | Dependencies and tool configuration |
 
-To create the same deck with reversed cards:
+## Development
 
-```bash
-python create_anki_deck.py "Phrasal Verbs.md" "Phrasal Verbs" --reverse
-```
+| Task | Command |
+|---|---|
+| Run the tests | `uv run pytest` |
+| Lint | `uv run ruff check .` |
+| Format | `uv run ruff format .` |
 
-### Markdown File Format
+The [CI workflow](.github/workflows/ci.yml) runs the same checks on Python 3.10 and 3.13 for every push.
 
-Your Markdown file should follow this format:
+## Changes since v1.0.0
 
-``` markdown
-- **Term 1** - Definition of term 1.
-- **Term 2** - Definition of term 2.
-- **Term 3** - Definition of term 3.
-```
+- **Fixed:** Lines with text between the term and the dash, such as `- **Bail up** (AUS) - …`, were skipped without
+  a message, including two of the three examples in the old README.
+- **Fixed:** Each run created a new deck in Anki, because the IDs came from the current time. IDs are now derived from
+  the deck name and the term.
+- Added `--output`, an error message when no cards are found, HTML escaping of the card text, `pyproject.toml` with
+  `uv.lock` (the old README referred to a `requirements.txt` that did not exist), tests and CI.
 
-Each line represents a flashcard, with the term bolded and its definition following the dash.
+## License
 
-Example `Phrasal Verbs.md`:
+[MIT](LICENSE) © 2024 Nicolas Huber
 
-``` markdown
-- **Back out of** - To withdraw from a commitment or promise.
-- **Bail up** (AUS) - To corner someone and start a conversation; historically, to rob someone.
-- **Bang on about** (AUS) - To talk about something for a long time, especially in a way that is boring to others.
-```
+## Author
+
+Nicolas Huber · [GitHub](https://github.com/HuberNicolas)
