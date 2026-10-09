@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/HuberNicolas/anki-deck-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/HuberNicolas/anki-deck-generator/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
-![Anki](https://img.shields.io/badge/Anki-235390?logo=anki&logoColor=white)
+![Anki](https://img.shields.io/badge/Anki-80C2EE?logo=anki&logoColor=white)
 ![uv](https://img.shields.io/badge/uv-DE5FE9?logo=uv&logoColor=white)
 ![Ruff](https://img.shields.io/badge/Ruff-D7FF64?logo=ruff&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
